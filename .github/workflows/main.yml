@@ -68,3 +68,29 @@ jobs:
         shell: bash
         run: |
           echo "Deploy PROD"
+  
+  deploy-aws:
+    needs: build
+    name: deploy-aws
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Download JAR
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: target/
+      - name: Display structure of download files
+        runs: ls - R
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+        # aws_session_key: ${{ secrets.AWS_SESSION_TOKEN }}
+          wait_for_environment_recovery: 90
+          use_existing_version_if_available: true
+          application_name: tech_challenge_pos_tech
+          environment_name: ${{ github.SHA }}
+          region: us-east-1
+          deployment_package: ./target/demo-0.0.2.7-SNAPSHOT.jar
