@@ -81,7 +81,7 @@ jobs:
           name: artifact
           path: target/
       - name: Display structure of download files
-        runs: ls - R
+        run: ls - R
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
         with:
